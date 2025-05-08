@@ -35,10 +35,39 @@ def login_user(email, password):
                 return result[0]  # user_id
             return None
 
-def get_tasks(user_id):
-    # Hier sollten Sie die Aufgaben aus der Datenbank abrufen
-    # Für dieses Beispiel verwenden wir stattdessen den Session State
-    pass
+def get_tasks(list_id):
+    with get_connection() as conn:
+        with conn.cursor() as cur:
+            cur.execute("""
+                SELECT task_id, task_name, completed
+                FROM tasks
+                WHERE list_id = %s
+                ORDER BY last_update DESC
+            """, (list_id,))
+            return cur.fetchall()
+        
+######### NOCH FEHLENDE FUNKTIONEN
+
+def get_user_lists(user_id):
+    """Hier Funktion zum Abrufen aller Listen eines Benutzers"""
+
+def delete_list(list_id):
+    """Hier Funktion zum Löschen einer Liste"""
+
+def create_list(user_id, list_name):
+    """Hier Funktion zum Erstellen einer neuen Liste"""
+
+def get_tasks(list_id):
+    """Hier Funktion zum Abrufen aller Aufgaben einer Liste"""
+
+def add_task(list_id, task_name):
+    """Hier Funktion zum Hinzufügen einer Aufgabe"""
+
+def update_task(task_id, completed):
+    """Hier Funktion zum Aktualisieren des Aufgabenstatus"""
+    
+def delete_task(task_id):
+    """Hier Funktion zum Löschen einer Aufgabe"""
 
 # =========================================================================================================
 # === streamlit starten ===
@@ -48,15 +77,6 @@ st.title("TuDu App")
 # Session State initialisieren
 if 'user_id' not in st.session_state:
     st.session_state.user_id = None
-if "todo_lists" not in st.session_state:
-    st.session_state.todo_lists = {
-        "Arbeit": ["Meeting vorbereiten", "Dokumente sortieren", "Projektplan aktualisieren"],
-        "Einkaufen": ["Milch", "Brot", "Äpfel"],
-        "Privat": ["Sport treiben", "Bücher lesen"],
-        "Projekte": ["Code überprüfen", "Dokumentation schreiben"]
-    }
-if "selected_list" not in st.session_state:
-    st.session_state.selected_list = "Arbeit"
 
 # === Login/Registrierung ===
 if st.session_state.user_id is None:
@@ -96,47 +116,70 @@ else:
         st.session_state.user_id = None
         st.rerun()
     
-    ### Seitenleiste: Listen anzeigen und verwalten ###
-    st.sidebar.title("🗂️ Meine Listen")
+    # Listen Management
+    st.sidebar.title("Meine Listen")
 
-    listen_namen = list(st.session_state.todo_lists.keys())
-    selected = st.sidebar.radio("Liste auswählen:", listen_namen, index=listen_namen.index(st.session_state.selected_list))
-    st.session_state.selected_list = selected
+    # Listen anzeigen
+    lists = get_user_lists(st.session_state.user_id)
+    if lists:
+        list_names = [lst[1] for lst in lists]
+        selected = st.sidebar.radio(
+            "Ausgewählte Liste",
+            list_names,
+            index=0
+        )
+        st.session_state.selected_list_id = next(lst[0] for lst in lists if lst[1] == selected)
 
-    # Neue Liste hinzufügen
-    new_list = st.sidebar.text_input("Neue Liste hinzufügen:")
-    if st.sidebar.button("➕ Liste erstellen"):
-        if new_list:
-            if new_list in st.session_state.todo_lists:
-                st.sidebar.warning("Diese Liste existiert bereits!")
-            else:
-                st.session_state.todo_lists[new_list] = []
+        # Neue Liste erstellen
+        with st.sidebar.form("new_list_form"):
+            new_list = st.text_input("Neue Liste erstellen")
+            if st.form_submit_button("Erstellen"):
+                if new_list:
+                    create_list(st.session_state.user_id, new_list)
+                    st.rerun()
 
-    # Liste löschen
-    if st.sidebar.button("🗑️ Liste löschen"):
-        if st.session_state.selected_list in st.session_state.todo_lists:
-            del st.session_state.todo_lists[st.session_state.selected_list]
+        # Liste löschen
+        if st.sidebar.button("🗑️ Liste löschen"):
+            delete_list(st.session_state.selected_list_id)
+            st.session_state.selected_list_id = None
+            st.rerun()
 
-    ### Hauptbereich: Aufgaben anzeigen und verwalten ###
-    st.title(f"📝 Aufgaben: {st.session_state.selected_list}")
+        ### Hauptbereich: Aufgaben anzeigen und verwalten ###
+        st.title(f"📝 Aufgaben: {st.session_state.selected_list}")
 
-    # Neue Aufgabe hinzufügen
-    new_task = st.text_input("Neue Aufgabe:")
-    if st.button("➕ Aufgabe hinzufügen"):
-        if new_task:
-            st.session_state.todo_lists[st.session_state.selected_list].append(new_task)
 
-    # Aufgaben anzeigen, erledigen oder löschen
-    if st.session_state.todo_lists[st.session_state.selected_list]:
-        for i, task in enumerate(st.session_state.todo_lists[st.session_state.selected_list]):
-            cols = st.columns([0.8, 0.1, 0.1])
-            with cols[0]:
-                st.write(f"◻ {task}")
-            with cols[1]:
-                if cols[1].button("✓", key=f"done_{i}"):
-                    st.session_state.todo_lists[st.session_state.selected_list][i] = f"✓ {task}"
-            with cols[2]:
-                if cols[2].button("🗑️", key=f"del_{i}"):
-                    del st.session_state.todo_lists[st.session_state.selected_list][i]
+        # Neue Aufgabe hinzufügen
+        with st.form("new_task_form"):
+            task = st.text_input("Neue Aufgabe:")
+            if st.form_submit_button("➕ Hinzufügen"):
+                if task:
+                    add_task(st.session_state.selected_list_id, task)
+                    st.rerun()
+
+        # Aufgaben anzeigen
+        tasks = get_tasks(st.session_state.selected_list_id)
+        if tasks:
+            for task in tasks:
+                task_id, task_name, completed = task
+                cols = st.columns([0.7, 0.15, 0.15])
+                
+                with cols[0]:
+                    st.write(f"{'✓' if completed else '◻'} {task_name}")
+                
+                with cols[1]:
+                    if st.button("Toggle", key=f"complete_{task_id}"):
+                        update_task(task_id, not completed)
+                        st.rerun()
+                
+                with cols[2]:
+                    if st.button("Löschen", key=f"delete_{task_id}"):
+                        delete_task(task_id)
+                        st.rerun()
+        else:
+            st.info("Keine Aufgaben in dieser Liste")
     else:
-        st.info("Keine Aufgaben in dieser Liste.")
+        st.info("Noch keine Listen vorhanden")
+        if st.button("Erste Liste erstellen"):
+            list_id = create_list(st.session_state.user_id, "Meine erste Liste")
+            st.session_state.selected_list_id = list_id
+            st.rerun()
