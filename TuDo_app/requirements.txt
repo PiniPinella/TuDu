@@ -1,0 +1,3 @@
+### Hier kommen alle Importe rein, damit der User weiß, was er vorher runterladen muss
+
+tkinter, psycopg2, pandas
