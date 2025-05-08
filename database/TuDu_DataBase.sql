@@ -146,9 +146,10 @@ VALUES
 	('Einkaufliste', 4),
 	('Anrufliste', 4);
 
+-- Passwortzeile hinzufügen
 
-
-
+ALTER TABLE users
+ADD COLUMN password VARCHAR(255);
 
 
 
