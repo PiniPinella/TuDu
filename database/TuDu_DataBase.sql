@@ -56,7 +56,7 @@ CREATE TABLE tasks (
     task_name VARCHAR(255) NOT NULL,
     description VARCHAR(255),
     deadline TIMESTAMP,
-    last_update TIMESTAMP DEFAULT CURRENT_DATE,
+    last_update TIMESTAMP DEFAULT CURRENT_TIME,
     priority SMALLINT CHECK (priority IN (1, 2, 3)),
     list_id INTEGER REFERENCES lists(list_id),
     user_id INTEGER REFERENCES users(user_id),
