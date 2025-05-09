@@ -56,8 +56,8 @@ CREATE TABLE tasks (
     task_name VARCHAR(255) NOT NULL,
     description VARCHAR(255),
     deadline TIMESTAMP,
-    last_update TIMESTAMP DEFAULT CURRENT_TIME,
-    priority SMALLINT CHECK (priority IN (1, 2, 3)),
+    last_update TIMESTAMP DEFAULT NOW(),
+    priority SMALLINT CHECK (priority BETWEEN 1 AND 5 OR priority IS NULL),
     list_id INTEGER REFERENCES lists(list_id),
     user_id INTEGER REFERENCES users(user_id),
     completed BOOLEAN DEFAULT FALSE,
@@ -89,11 +89,11 @@ VALUES
 INSERT INTO tasks 
     (task_name, description, deadline, last_update, priority, list_id, user_id, completed, repeat, reminder) 
 VALUES
-	('Einkaufen', 'Milch, Brot, Eier besorgen', '2025-05-08', CURRENT_DATE, 2, 1, 4, FALSE, FALSE, NULL),
+	('Einkaufen', 'Milch, Brot, Eier besorgen', '2025-05-10', CURRENT_DATE, 2, 1, 4, FALSE, FALSE, NULL),
 	('Praxisprojekt SQL', 'Präsentation fertigstellen', '2025-05-14', CURRENT_DATE, 1, 2, 4, FALSE, FALSE, NULL),
-	('Trinken', 'Trinken', '2025-05-07', CURRENT_DATE, 3, 2, 4, FALSE, TRUE, NULL),
+	('Trinken', 'Trinken', '2025-05-12', CURRENT_DATE, 3, 2, 4, FALSE, TRUE, NULL),
 	('Steuererklärung', 'Formulare ausfüllen und abgeben', '2025-06-01', CURRENT_DATE, 1, 2, 4, FALSE, FALSE, NULL),
-	('Kita Termin vereinbaren', 'Generelles Update', '2025-05-07', CURRENT_DATE, 2, 2, 4, FALSE, FALSE, NULL);
+	('Kita Termin vereinbaren', 'Generelles Update', '2025-05-15', CURRENT_DATE, 2, 2, 4, FALSE, FALSE, NULL);
 
 
 -------------------------------------------------------------------------------------------------------------------
