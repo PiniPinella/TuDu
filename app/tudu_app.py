@@ -35,7 +35,7 @@ def login_user(email, password):
                 return result[0]  # user_id
             return None
 
-def get_tasks(list_id):
+def get_tasks(list_id): ### BETA VON SUSE
     with get_connection() as conn:
         with conn.cursor() as cur:
             cur.execute("""
@@ -46,6 +46,20 @@ def get_tasks(list_id):
             """, (list_id,))
             return cur.fetchall()
         
+def create_list(user_id, list_name): 
+    with get_connection() as conn:
+        with conn.cursor() as cur:
+            query = '''INSERT INTO lists (user_id, list_name) VALUES (%s, %s)'''
+            cur.execute(query,(user_id, list_name))
+            conn.commit()
+
+def add_task(task_id, task_name, deadline, priority, category_id, user_id, completed, repeat, list_id):
+    with get_connection() as conn:
+        with conn.cursor() as cur:
+            query = '''INSERT INTO tasks (task_id, task_name, deadline, priority, category_id, user_id, completed, repeat, list_id) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)'''
+            cur.execute(query,(list_id, task_name))
+            conn.commit()
+        
 ######### NOCH FEHLENDE FUNKTIONEN
 
 def get_user_lists(user_id):
@@ -54,14 +68,8 @@ def get_user_lists(user_id):
 def delete_list(list_id):
     """Hier Funktion zum Löschen einer Liste"""
 
-def create_list(user_id, list_name):
-    """Hier Funktion zum Erstellen einer neuen Liste"""
-
 def get_tasks(list_id):
     """Hier Funktion zum Abrufen aller Aufgaben einer Liste"""
-
-def add_task(list_id, task_name):
-    """Hier Funktion zum Hinzufügen einer Aufgabe"""
 
 def update_task(task_id, completed):
     """Hier Funktion zum Aktualisieren des Aufgabenstatus"""
@@ -119,7 +127,20 @@ else:
     # Listen Management
     st.sidebar.title("Meine Listen")
 
-    # Listen anzeigen
+    # Listen-Erstell-UI
+    with st.sidebar:
+        # Neue Liste erstellen
+        if st.toggle("➕ Neue Liste", key="new_list_toggle"):
+            with st.form("new_list_form"):
+                new_list = st.text_input("Name der neuen Liste", key="new_list_input")
+                if st.form_submit_button("Erstellen"):
+                    if new_list.strip():
+                        create_list(st.session_state.user_id, new_list)
+                        st.rerun()
+                    else:
+                        st.warning("Bitte Namen eingeben")
+
+    # Bestehende Listen anzeigen
     lists = get_user_lists(st.session_state.user_id)
     if lists:
         list_names = [lst[1] for lst in lists]
@@ -130,21 +151,24 @@ else:
         )
         st.session_state.selected_list_id = next(lst[0] for lst in lists if lst[1] == selected)
 
-        # Neue Liste erstellen
-        with st.sidebar.form("new_list_form"):
-            new_list = st.text_input("Neue Liste erstellen")
-            if st.form_submit_button("Erstellen"):
-                if new_list:
-                    create_list(st.session_state.user_id, new_list)
-                    st.rerun()
 
         # Liste löschen
-        if st.sidebar.button("🗑️ Liste löschen"):
+        if st.sidebar.button("🗑️ Aktuelle Liste löschen"):
             delete_list(st.session_state.selected_list_id)
             st.session_state.selected_list_id = None
             st.rerun()
+    else:
+        st.info("Noch keine Listen vorhanden")
+        ### Knopf für erste Liste obsolet
 
-        ### Hauptbereich: Aufgaben anzeigen und verwalten ###
+        # if st.button("Erste Liste erstellen"):
+        #     list_id = create_list(st.session_state.user_id, "Meine erste Liste")
+        #     st.session_state.selected_list_id = list_id
+        #     st.rerun()
+
+
+    ### Hauptbereich: Aufgaben anzeigen und verwalten ###
+    if lists:
         st.title(f"📝 Aufgaben: {st.session_state.selected_list}")
 
 
@@ -177,9 +201,3 @@ else:
                         st.rerun()
         else:
             st.info("Keine Aufgaben in dieser Liste")
-    else:
-        st.info("Noch keine Listen vorhanden")
-        if st.button("Erste Liste erstellen"):
-            list_id = create_list(st.session_state.user_id, "Meine erste Liste")
-            st.session_state.selected_list_id = list_id
-            st.rerun()

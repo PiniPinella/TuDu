@@ -16,10 +16,32 @@ def get_connection():
 
 ### Funktionen ###
 
+def create_list(user_id, list_name): 
+    with get_connection() as conn:
+        with conn.cursor() as cur:
+            query = '''INSERT INTO lists (user_id, list_name) VALUES (%s, %s)'''
+            cur.execute(query,(user_id, list_name))
+            conn.commit()
 
+def add_task(task_id, task_name, description, deadline, last_update, priority, category_id, user_id, completed, repeat, list_id):
+    with get_connection() as conn:
+        with conn.cursor() as cur:
+            query = '''INSERT INTO tasks (task_id, task_name, description, deadline, last_update, priority, category_id, user_id, completed, repeat, list_id) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)'''
+            cur.execute(query,(list_id, task_name))
+            conn.commit()
+    
 
+def view_tasks(user_id):   ### BETAVERSION
+    query = f'''SELECT task_name FROM tasks WHERE user_id = {user_id}'''
+    tasks = pd.read_sql(query, connection)
+    return tasks
 
-def get_tasks(list_id):
+def update_task(task_id, new_status): ### BETAVERSION
+    update_query = 'UPDATE tasks SET completed = %s WHERE task_id = %s'
+    cursor.execute(update_query, (new_status, task_id))
+    connection.commit()
+
+def get_tasks(list_id): ###BETAVERSION
     with get_connection() as conn:
         with conn.cursor() as cur:
             cur.execute("""
@@ -34,23 +56,13 @@ def get_tasks(list_id):
 
 ######### NOCH FEHLENDE FUNKTIONEN
 
-def get_user_lists(user_id):
-    """Hier Funktion zum Abrufen aller Listen eines Benutzers"""
+
 
 def delete_list(list_id):
     """Hier Funktion zum Löschen einer Liste"""
 
-def create_list(user_id, list_name):
-    """Hier Funktion zum Erstellen einer neuen Liste"""
-
-def get_tasks(list_id):
-    """Hier Funktion zum Abrufen aller Aufgaben einer Liste"""
-
-def add_task(list_id, task_name):
-    """Hier Funktion zum Hinzufügen einer Aufgabe"""
-
-def update_task(task_id, completed):
-    """Hier Funktion zum Aktualisieren des Aufgabenstatus"""
-    
 def delete_task(task_id):
     """Hier Funktion zum Löschen einer Aufgabe"""
+
+def get_user_lists(user_id):
+    """Hier Funktion zum Abrufen aller Listen eines Benutzers"""
