@@ -1,143 +1,81 @@
-
------------------------------------------------------------------------------------------------------------
--- Praxisprojekt TuDu-Liste 
--- Catarina, Laura, Aleksej, Jo
+-- ======= TuDu_DataBase =======
+-------------------------------------------------------------------------------------------------------------------
+-- PraxisprojektSQL: To Do Liste:  ===== TuDu_DataBase =====
+-- Catarina, Laura, Jo
 -- Beginn: 250507
------------------------------------------------------------------------------------------------------------
+-------------------------------------------------------------------------------------------------------------------
 
--- Erstellt die Datenbank "TuDu"
-CREATE DATABASE "TuDu";
+-- Erstellen der TuDu Database:
+-- Copy/Paste folgende Codezeilen in ein anderes postgreSQL Skript: 
+-- Verbinde mit TuDu DataBase,
+-- Dann Run Skript
 
--- Falls man die DB nochmal droppen muss:
-DROP DATABASE "TuDu";
+/* 
 
--- Beende alle Verbindungen zur Datenbank "TuDu", außer der eigenen Verbindung
+-- Beende alle Verbindungen zur Datenbank "TuDu", außer der eigenen Verbindung 
 SELECT pg_terminate_backend(pid)
 FROM pg_stat_activity
 WHERE datname = 'TuDu'
   AND pid <> pg_backend_pid();
 
 
-
-------------------------------------------------------------------------------------------
--- tasks Tabelle erstellen:
-CREATE TABLE tasks (
-    task_id SERIAL PRIMARY KEY,
-    task_name VARCHAR(255) NOT NULL,
-    description VARCHAR(255),
-    deadline DATE,
-    last_update DATE DEFAULT CURRENT_DATE,
-    priority SMALLINT CHECK (priority IN (1, 2, 3)),
-    category_id INTEGER,
-    user_id INTEGER,
-    completed BOOLEAN DEFAULT FALSE,
-    repeat BOOLEAN DEFAULT FALSE
-);
-
-SELECT * FROM tasks;
+-- und jetzt die DataBase droppen::   
+DROP DATABASE "TuDu";
 
 
------------------------------------------------------------------------------------------
+-- die Datenbank "TuDu" erstellen:
+CREATE DATABASE "TuDu";
+
+*/
+
+-----------------------------------------------------------------------------------------------------------------
 -- User Table erstellen:
 CREATE TABLE users (
     user_id SERIAL PRIMARY KEY,
     first_name VARCHAR(100) NOT NULL,
     last_name VARCHAR(100) NOT NULL,
-    email VARCHAR(255) UNIQUE NOT NULL
+    email VARCHAR(255) UNIQUE NOT NULL,
+    "password" VARCHAR(255)
 );
 
-SELECT * FROM users;
-
--- Fremdschlüssel in tasks setzen:
-ALTER TABLE tasks
-ADD CONSTRAINT fk_user
-FOREIGN KEY (user_id)
-REFERENCES users(user_id);
-
-
------------------------------------------------------------------------------------------
--- category Table erstellen:
-CREATE TABLE category (
-    category_id SERIAL PRIMARY KEY,
-    category_name VARCHAR(100) NOT NULL
-);
-
-SELECT * FROM category;
-
-
--- und Fremdschlüssel definieren
-ALTER TABLE tasks
-ADD CONSTRAINT fk_category
-FOREIGN KEY (category_id)
-REFERENCES category(category_id);
-
-
------------------------------------------------------------------------------------------
+------------------------------------------------------------------------------------------------------------------
 -- lists Tabelle erstellen:
 -- Fremdschlüssel wird gleich mit erstellt mit REFERENCES users(user_id)
--- ON DELETE CASCADE bedeutet: wenn users gelöscht werden, werden alle Zeilen mit dieser user_id mitgelöscht
+-- ON DELETE CASCADE bedeutet: 
+-- wenn users gelöscht werden, werden alle Zeilen mit dieser user_id mitgelöscht
 CREATE TABLE lists (
     list_id SERIAL PRIMARY KEY,
     list_name TEXT NOT NULL,
     user_id INTEGER REFERENCES users(user_id) ON DELETE CASCADE
 );
 
-SELECT * FROM lists;
+------------------------------------------------------------------------------------------------------------------
+-- tasks Tabelle erstellen:
+CREATE TABLE tasks (
+    task_id SERIAL PRIMARY KEY,
+    task_name VARCHAR(255) NOT NULL,
+    description VARCHAR(255),
+    deadline TIMESTAMP,
+    last_update TIMESTAMP DEFAULT CURRENT_DATE,
+    priority SMALLINT CHECK (priority IN (1, 2, 3)),
+    list_id INTEGER REFERENCES lists(list_id),
+    user_id INTEGER REFERENCES users(user_id),
+    completed BOOLEAN DEFAULT FALSE,
+    repeat BOOLEAN DEFAULT FALSE,
+    reminder TIMESTAMP DEFAULT NULL
+);
 
-
--- Neue Spalte list_id in category einfügen:
-ALTER TABLE category
-ADD COLUMN list_id INTEGER;
-
-
--- und Fremdschlüssel definieren:
-ALTER TABLE category
-ADD CONSTRAINT fk_list
-FOREIGN KEY (list_id)
-REFERENCES lists(list_id) ON DELETE CASCADE;
-
-
-------------------------------------------------------------------------------------------------------------
+-------------------------------------------------------------------------------------------------------------------
 -- Beispieldaten einfügen:
-
-SELECT * FROM tasks;
-SELECT * FROM users;
-SELECT * FROM category;
-SELECT * FROM lists;
 
 
 -- Insert into users:
-INSERT INTO users (first_name, last_name, email)
+INSERT INTO users (first_name, last_name, email, "password")
 VALUES 
-	('Catarina', 'Boecker', 'cabo@gmail.com'),
-	('Laura', 'Richter', 'lari@gmail.com'),
-	('Aleksei', 'Assmus', 'alas@gmail.com'),
-	('Jo', 'Jauch', 'joja@gmail.com');
-
-SELECT user_id, first_name, last_name FROM users;
-
-
--- Insert into Categories:
-INSERT INTO category (category_name)
-VALUES 
-	('family'),
-	('official'),
-	('today'),
-	('personel'),
-	('official'),
-	('hobby'),
-	('contact');
-
-
--- Insert into tasks:
-INSERT INTO tasks 
-    (task_name, description, deadline, last_update, priority, category_id, user_id, completed, repeat) 
-VALUES
-	('Einkaufen', 'Milch, Brot, Eier besorgen', '2025-05-08', CURRENT_DATE, 2, 1, 4, FALSE, FALSE),
-	('Praxisprojekt SQL', 'Präsentation fertigstellen', '2025-05-14', CURRENT_DATE, 1, 2, 4, FALSE, FALSE),
-	('Trinken', 'Trinken', '2025-05-07', CURRENT_DATE, 3, 3, 4, FALSE, TRUE),
-	('Steuererklärung', 'Formulare ausfüllen und abgeben', '2025-06-01', CURRENT_DATE, 1, 4, 4, FALSE, FALSE),
-	('Kita Termin vereinbaren', 'Generelles Update', '2025-05-07', CURRENT_DATE, 2, 2, 4, FALSE, FALSE);
+	('Catarina', 'Boecker', 'cabo@gmail.com',1234),
+	('Laura', 'Richter', 'lari@gmail.com',1234),
+	('Aleksei', 'Assmus', 'alas@gmail.com',1234),
+	('Jo', 'Jauch', 'joja@gmail.com',1234);
 
 
 -- Insert into lists:
@@ -146,14 +84,55 @@ VALUES
 	('Einkaufliste', 4),
 	('Anrufliste', 4);
 
--- Passwortzeile hinzufügen
 
-ALTER TABLE users
-ADD COLUMN password VARCHAR(255);
+-- Insert into tasks:
+INSERT INTO tasks 
+    (task_name, description, deadline, last_update, priority, list_id, user_id, completed, repeat, reminder) 
+VALUES
+	('Einkaufen', 'Milch, Brot, Eier besorgen', '2025-05-08', CURRENT_DATE, 2, 1, 4, FALSE, FALSE, NULL),
+	('Praxisprojekt SQL', 'Präsentation fertigstellen', '2025-05-14', CURRENT_DATE, 1, 2, 4, FALSE, FALSE, NULL),
+	('Trinken', 'Trinken', '2025-05-07', CURRENT_DATE, 3, 2, 4, FALSE, TRUE, NULL),
+	('Steuererklärung', 'Formulare ausfüllen und abgeben', '2025-06-01', CURRENT_DATE, 1, 2, 4, FALSE, FALSE, NULL),
+	('Kita Termin vereinbaren', 'Generelles Update', '2025-05-07', CURRENT_DATE, 2, 2, 4, FALSE, FALSE, NULL);
 
 
+-------------------------------------------------------------------------------------------------------------------
+
+SELECT * FROM tasks;
+SELECT * FROM users;
+SELECT * FROM lists;
+
+-------------------------------------------------------------------------------------------------------------------
+
+-- Spalte hinzufügen:
+-- ALTER TABLE users
+-- ADD COLUMN password VARCHAR(255);
+
+-- Spalte entfernen:
+-- ALTER TABLE tasks
+-- DROP COLUMN IF EXISTS reminder;
+
+-- Spalte umbennen:
+-- ALTER TABLE tasks
+-- RENAME COLUMN reminder TO reminder_time;
 
 
+--------------------------------------------------------------------------------------------------------------------
+-- Trigger für last_update = NOW()
+CREATE OR REPLACE FUNCTION last_update()
+RETURNS TRIGGER AS $$
+BEGIN 
+	NEW.last_update = NOW();
+	RETURN NEW;
+END
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER last_update_trigger
+BEFORE UPDATE ON tasks
+FOR EACH ROW
+EXECUTE FUNCTION last_update();
+
+---------------------------------------------------------------------------------------------------------------------
 
 
 
