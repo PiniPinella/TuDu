@@ -1,14 +1,26 @@
-### BEISPIELCODE ###
+################################## TuDu_App  ##########################################
+# main.py  ojo
 
-from app.gui import start_gui
-from database.db import init_db
+# main() Startet streamlit:
+# sucht nach der streamlit Anwendung im Pfad als Failsafe
 
-def main():
-    # Initialisiere die Datenbank (z. B. falls sie beim ersten Start noch nicht existiert)
-    init_db()
+# streamlit run tudu_app.py
 
-    # Starte die grafische Oberfläche
-    start_gui()
+import os
+import subprocess
+import shutil
+
+def start_streamlit():
+    base_dir = os.path.dirname(os.path.abspath(__file__))
+    tudu_root = os.path.abspath(os.path.join(base_dir, ".."))  # TuDu/
+    script_path = os.path.join(tudu_root, "app", "tudu_app.py")
+    # script_path = os.path.join(base_dir, "app", "tudu_app.py")
+    streamlit_exe = shutil.which("streamlit")
+
+    if streamlit_exe is None:
+        raise RuntimeError("Streamlit wurde nicht gefunden. Ist es in der Umgebung installiert?")
+
+    subprocess.run([streamlit_exe, "run", script_path])
 
 if __name__ == "__main__":
-    main()
+    start_streamlit()
