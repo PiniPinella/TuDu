@@ -61,7 +61,7 @@ CREATE TABLE tasks (
     list_id INTEGER REFERENCES lists(list_id),
     user_id INTEGER REFERENCES users(user_id),
     completed BOOLEAN DEFAULT FALSE,
-    repeat BOOLEAN DEFAULT FALSE,
+    repeat_interval INTEGER DEFAULT 0,
     reminder TIMESTAMP DEFAULT NULL
 );
 
@@ -87,15 +87,15 @@ VALUES
 
 -- Insert into tasks:
 INSERT INTO tasks 
-    (task_name, description, deadline, last_update, priority, list_id, user_id, completed, repeat, reminder) 
+    (task_name, description, deadline, last_update, priority, list_id, user_id, completed, repeat_interval, reminder) 
 VALUES
-	('Einkaufen', 'Milch, Brot, Eier besorgen', '2025-05-10', CURRENT_DATE, 2, 1, 4, FALSE, FALSE, NULL),
-	('Praxisprojekt SQL', 'Präsentation fertigstellen', '2025-05-14', CURRENT_DATE, 1, 2, 4, FALSE, FALSE, NULL),
-	('Trinken', 'Trinken', '2025-05-12', CURRENT_DATE, 3, 2, 4, FALSE, TRUE, NULL),
-	('Steuererklärung', 'Formulare ausfüllen und abgeben', '2025-06-01', CURRENT_DATE, 1, 2, 4, FALSE, FALSE, NULL),
-	('Kita Termin vereinbaren', 'Generelles Update', '2025-05-15', CURRENT_DATE, 2, 2, 4, FALSE, FALSE, NULL);
+	('Einkaufen', 'Milch, Brot, Eier besorgen', '2025-05-15', CURRENT_DATE, 2, 1, 4, FALSE, 7, NULL),
+	('Praxisprojekt SQL', 'Präsentation fertigstellen', '2025-05-14', CURRENT_DATE, 1, 2, 4, FALSE, 0, NULL),
+	('Trinken', 'Trinken', '2025-05-12', CURRENT_DATE, 3, 2, 4, FALSE, 1, NULL),
+	('Steuererklärung', 'Formulare ausfüllen und abgeben', '2025-06-01', CURRENT_DATE, 1, 2, 4, FALSE, 0, NULL),
+	('Kita Termin vereinbaren', 'Generelles Update', '2025-05-15', CURRENT_DATE, 2, 2, 4, FALSE, 0, NULL);
 
-
+-- DROP TABLE tasks;
 -------------------------------------------------------------------------------------------------------------------
 
 SELECT * FROM tasks;
@@ -134,6 +134,10 @@ EXECUTE FUNCTION last_update();
 
 ---------------------------------------------------------------------------------------------------------------------
 
+-- TIMESTAMP nachträglich in DATE umwandeln:
+-- ALTER TABLE deine_tabelle
+-- ALTER COLUMN deadline TYPE DATE
+-- USING deadline::DATE;
 
 
 
