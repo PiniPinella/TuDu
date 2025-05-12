@@ -48,9 +48,9 @@ def get_user_lists(user_id):
     df = pd.read_sql(query, connection, params= (user_id,))
     return df
 
-def create_list(user_id, list_id): 
+def create_list(user_id, list_name): 
     query = '''INSERT INTO lists (user_id, list_name) VALUES (%s, %s)'''
-    cursor.execute(query,(user_id, list_id))
+    cursor.execute(query,(user_id, list_name))
     connection.commit()
 
 def delete_list(list_id):
