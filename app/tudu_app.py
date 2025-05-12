@@ -4,13 +4,19 @@ import bcrypt
 from datetime import datetime
 import pandas as pd
 
+import os
+from streamlit_autorefresh import st_autorefresh  # pip install streamlit-autorefresh
+import base64
+
+# streamlit run app\tudu_app.py
+
 # === Verbindungs Config ================================================================================
 db_config = {
     'host': 'localhost',  
     'port': 5433,  # anpassen wenn nötig
     'dbname': 'TuDu',
     'user': 'postgres',  # anpassen wenn nötig
-    'password': 'pups'  # anpassen wenn nötig
+    'password': 'postgres'  # anpassen wenn nötig
 }
 
 # === VERBINDUNG mit TuDu DATABASE ===
@@ -206,7 +212,7 @@ else:
     # Listen Management
     st.sidebar.title("Meine Listen")
 
-    # Listen-Erstell-UI
+    '''# Listen-Erstell-UI
     with st.sidebar:
         # Neue Liste erstellen
         if st.button("➕ Neue Liste", key="new_list_toggle"):
@@ -220,7 +226,23 @@ else:
                             st.rerun()
                 with col2:
                     if st.form_submit_button("Abbrechen"):
-                        st.rerun()
+                        st.rerun()'''
+    
+    with st.sidebar:
+    # Formular anzeigen
+        with st.form("new_list_form", clear_on_submit=True):
+            st.subheader("Neue Liste erstellen")
+            new_list_name = st.text_input("Name der neuen Liste")
+            submitted = st.form_submit_button("Erstellen")
+
+            if submitted:
+                if new_list_name.strip():
+                    create_list(st.session_state.user_id, new_list_name.strip())
+                    st.success(f"Liste '{new_list_name}' wurde erstellt.")
+                    st.rerun()
+                else:
+                    st.warning("Bitte gib einen gültigen Namen ein.")
+
 
 
     # Bestehende Listen anzeigen
