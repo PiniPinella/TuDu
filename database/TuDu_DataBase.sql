@@ -1,7 +1,7 @@
 -- ======= TuDu_DataBase =======
 -------------------------------------------------------------------------------------------------------------------
 -- PraxisprojektSQL: To Do Liste:  ===== TuDu_DataBase =====
--- Catarina, Laura, Jo
+-- Caterina, Laura, Jo
 -- Beginn: 250507
 -------------------------------------------------------------------------------------------------------------------
 
@@ -72,7 +72,7 @@ CREATE TABLE tasks (
 -- Insert into users:
 INSERT INTO users (first_name, last_name, email, "password")
 VALUES 
-	('Catarina', 'Boecker', 'cabo@gmail.com',1234),
+	('Caterina', 'Boecker', 'cabo@gmail.com',1234),
 	('Laura', 'Richter', 'lari@gmail.com',1234),
 	('Aleksei', 'Assmus', 'alas@gmail.com',1234),
 	('Jo', 'Jauch', 'joja@gmail.com',1234);
