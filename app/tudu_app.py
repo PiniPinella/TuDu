@@ -16,7 +16,7 @@ db_config = {
     'port': 5433,  # anpassen wenn nötig
     'dbname': 'TuDu',
     'user': 'postgres',  # anpassen wenn nötig
-    'password': 'postgres'  # anpassen wenn nötig
+    'password': 'pups'  # anpassen wenn nötig
 }
 
 # === VERBINDUNG mit TuDu DATABASE ===
@@ -60,8 +60,13 @@ def create_list(user_id, list_name):
     connection.commit()
 
 def delete_list(list_id):
-    query = '''DELETE FROM lists where list_id = %s'''
-    cursor.execute(query, (list_id,))
+    try:
+        cursor.execute("DELETE FROM lists WHERE list_id = %s", (list_id,))
+        connection.commit()
+        return True
+    except Exception as e:
+        st.error(f"Fehler beim Löschen: {e}")
+        return False
 
 # === Tasks =============================================================================================
 
@@ -255,20 +260,22 @@ else:
             list_names,
             index=0
             )
-        st.session_state.selected_list_id = selected
+        st.session_state.selected_list_id = int(lists.loc[lists['list_name'] == selected, 'list_id'].iloc[0])
+        st.session_state.selected_list_name = selected
 
 
     # Liste löschen
-    if st.sidebar.button("🗑️ Aktuelle Liste löschen"):
-            delete_list(st.session_state.selected_list_id)
-            st.session_state.selected_list_id = None
+if st.sidebar.button("🗑️ Aktuelle Liste löschen"):
+    if 'selected_list_id' in st.session_state:
+        # DEBUG: Ausgabe zur Überprüfung
+        st.write(f"Versuche zu löschen: ID={st.session_state.selected_list_id}, Typ={type(st.session_state.selected_list_id)}")
+        
+        if delete_list(st.session_state.selected_list_id):
+            st.success("Liste erfolgreich gelöscht!")
+            del st.session_state.selected_list_id  # Clear the selection
             st.rerun()
-
-        # if st.button("Erste Liste erstellen"):
-        #     list_id = create_list(st.session_state.user_id, "Meine erste Liste")
-        #     st.session_state.selected_list_id = list_id
-        #     st.rerun()
-
+    else:
+        st.warning("Keine Liste ausgewählt")
 
     ### Hauptbereich: Aufgaben anzeigen und verwalten ###
     if lists:
