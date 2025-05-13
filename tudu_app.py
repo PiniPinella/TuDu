@@ -206,6 +206,30 @@ else:
             # Dann in den assets-Ordner:
             file_path = os.path.join(base_dir, "assets", selected_file)
             play_button_jingle(file_path)
+
+
+# === DEVELOPER MODE =========================================================================================
+   
+    if st.session_state.user_id:
+        with st.sidebar:
+            st.markdown("---")
+            # Developer Mode Toggle
+            dev_mode = st.toggle("🔧 Developer Mode", key="dev_mode")
+            base_dir = os.path.dirname(__file__)
+            if not dev_mode:
+                pass
+            else:
+                # Developer-Ansicht
+                st.title("Developer Backend")
+                if st.button("??"):
+                    st.write(os.path.join(base_dir, "pages", "test.py"))
+                if st.button("Backend"):
+                    st.switch_page("pages/test.py")
+                if st.button("DataFrames"):
+                    st.switch_page("pages/dataframe.py")
+                if st.button("Code"):
+                    st.switch_page("pages/code_1.py")
+                    
     
     # === Reminder prüfen & Autorefresh aktivieren ===========================================================
     if (st.session_state.get("user_id")
@@ -223,20 +247,7 @@ else:
 
 # === DEVELOPER MODE =========================================================================================
 
-if st.session_state.user_id:
-    with st.sidebar:
-        st.markdown("---")
-        # Developer Mode Toggle
-        dev_mode = st.toggle("🔧 Developer Mode", key="dev_mode")
-        
-        if dev_mode:
-            st.markdown("### Backend Pages")
-            pg = st.navigation([
-                st.Page("pages/test.py", title="Backend", icon="🔧"),
-                st.Page("pages/dataframe.py", title="DataFrames", icon="📊"),
-                st.Page("pages/code_1.py", title="Code", icon="💻")
-            ])
-            pg.run()
+
 
 # === CUSTOM STYLING =========================================================================================
 st.markdown(    
