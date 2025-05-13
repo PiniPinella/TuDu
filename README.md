@@ -22,13 +22,11 @@ Eine intuitive To-Do App mit PostgreSQL-Datenbank, entwickelt als Praxisprojekt 
 
 tudu_app/
 ├── assets/ # Medien-Dateien
-│ ├── audio/ # Erinnerungs-Sounds
 ├── crud/ # Datenbankoperationen
 ├── utils/ # Hilfsfunktionen
-└── tudu_app.py # Hauptanwendung
-└── README
+├── tudu_app.py # Hauptanwendung
+├── README
 └── requirements
-
 
 ## 🚀 Installation
 1. **Anpassungen in tudu_app.py**:

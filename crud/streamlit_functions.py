@@ -9,7 +9,7 @@ import base64
 
 ######
 
-from crud.users import get_connection
+from utils.db_config import get_connection
 from crud.tasks import update_task_status, delete_task, update_tasks, get_tasks_df
 
 

@@ -10,7 +10,7 @@ import base64
 
 ######
 
-from crud.users import get_connection
+from utils.db_config import get_connection
 
 
 # === REMINDER ===============================================================================================
@@ -21,7 +21,7 @@ def get_due_reminders(user_id):
         query = '''
             SELECT task_name, reminder, deadline
             FROM tasks
-            WHERE user_id = %s AND completed = FALSE AND reminder IS NOT NULL AND reminder >= NOW()
+            WHERE user_id = %s AND completed = FALSE AND reminder IS NOT NULL
         '''
         return pd.read_sql(query, connection, params=(user_id,))
     
@@ -38,10 +38,10 @@ def check_due_reminders(due_tasks, play_sound=False):
             st.sidebar.warning(
                 f"Achtung! '{row.task_name}' ist fällig bis: {row.deadline.strftime('%d.%m.%Y %H:%M')}")
             st.toast(f"HEEEEYY! '{row.task_name}' ist jetzt dran!")
-            remove_reminder(row.task_name, st.session_state.user_id)
             if play_sound:
                 play_jingle()
-        
+                remove_reminder(row.task_name, st.session_state.user_id)
+                
         if deadline_time == now:  
             st.sidebar.error(f"Deadline erreicht: '{row.task_name}'!")
             st.toast(f"Deadline erreicht für '{row.task_name}'!")
@@ -101,7 +101,7 @@ def play_jingle():
 def play_deadline_jingle():
     selected_file = "Hey.mp3"
     base_dir = os.path.dirname(__file__)
-    file_path = os.path.join(base_dir, selected_file)  # Deadline-Sound
+    file_path = os.path.join(base_dir, "assets", selected_file)  # Deadline-Sound
     audio_base64 = get_base64_audio(file_path)
     sound_html = f"""
     <audio autoplay>

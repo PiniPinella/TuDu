@@ -7,7 +7,7 @@ import psycopg2
 import bcrypt
 import base64
 ######
-from crud.users import get_connection
+from utils.db_config import get_connection
 
 # === LISTS ==================================================================================================
 

@@ -8,19 +8,7 @@ import psycopg2
 import bcrypt
 from datetime import datetime
 
-# === Verbindungs Config ================================================================================
-db_config = {
-    'host': 'localhost',  
-    'port': 5433,  # anpassen wenn nötig
-    'dbname': 'TuDu',
-    'user': 'postgres',  # anpassen wenn nötig
-    'password': 'postgres'  # anpassen wenn nötig
-}
-
-# === VERBINDUNG mit TuDu DATABASE ===
-def get_connection():
-    return psycopg2.connect(**db_config)
-
+from db_config import get_connection
 
 # === User erstellen (erstes Mal) =======================================================================
 def create_user(first_name, last_name, email, password):
@@ -89,8 +77,3 @@ else:
     # Bei allen Funktionen wo user_id übergeben werden soll
     # st.session_state.user_id übergeben.
     
-    # So zum Beispiel, Übergabe an Funktion get_tasks:
-    tasks = get_tasks(st.session_state.user_id)
-    
-    
-    # streamlit run TuDu_login.py

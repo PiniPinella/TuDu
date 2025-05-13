@@ -23,15 +23,7 @@ from crud.streamlit_functions import render_show_task, render_delete_task, rende
 # UTILS
 from utils.reminders import get_due_reminders, check_due_reminders, remove_reminder, get_base64_audio, play_jingle, play_deadline_jingle, play_button_jingle
 
-# === VERBINDUNGS CONFIG =====================================================================================
-db_config = {
-    'host': 'localhost',  
-    'port': 5433,  # anpassen wenn nötig
-    'dbname': 'TuDu',
-    'user': 'postgres',  # anpassen wenn nötig
-    'password': 'postgres'  # anpassen wenn nötig
-}
-        
+     
 # === START STREAMLIT MAIN CODE ==============================================================================
 # ============================================================================================================
 
@@ -209,8 +201,10 @@ else:
 
         # Button zum Abspielen
         if st.button("Play Jingle"):
-            base_dir = os.path.dirname(__file__)
-            file_path = os.path.join(base_dir, selected_file)
+            # Vom base _dir ein Ordner hoch:
+            base_dir = os.path.dirname(__file__)  # __file__ ist der absolute Pfad zum ausführenden Skript (tudu_app.py)
+            # Dann in den assets-Ordner:
+            file_path = os.path.join(base_dir, "assets", selected_file)
             play_button_jingle(file_path)
     
     # === Reminder prüfen & Autorefresh aktivieren ===========================================================

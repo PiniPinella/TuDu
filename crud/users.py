@@ -7,16 +7,7 @@ import psycopg2
 import bcrypt
 import base64
 
-# === VERBINDUNG mit TuDu DATABASE ===========================================================================
-db_config= {'dbname': 'TuDu',
-'user': 'postgres',
-'password': 'pups',
-'host': 'localhost',
-'port': '5433'
-}
-
-def get_connection():
-    return psycopg2.connect(**db_config)
+from utils.db_config import get_connection
 
 # === LOGIN USER =============================================================================================
 
