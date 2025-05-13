@@ -13,8 +13,9 @@ import shutil
 
 def start_streamlit():
     base_dir = os.path.dirname(os.path.abspath(__file__))  # absoluter Pfad zu main.py
-    tudu_root = os.path.abspath(os.path.join(base_dir, ".."))  # geht hoch in Ordner TuDu/
-    script_path = os.path.join(tudu_root, "app", "tudu_app.py")
+    #tudu_root = os.path.abspath(os.path.join(base_dir, ".."))  # geht hoch in Ordner TuDu/
+    #script_path = os.path.join(tudu_root, "tudu_app.py")
+    script_path = os.path.join(base_dir, "tudu_app.py")
      
     streamlit_exe = shutil.which("streamlit")  
     # CHeck ob streamlit.exe im Systempfad verfügbar ist, 
