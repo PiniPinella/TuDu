@@ -7,7 +7,7 @@ db_config = {
     'port': 5433,
     'dbname': 'TuDu',
     'user': 'postgres',
-    'password': 'postgres'
+    'password': 'pups'
 }
 
 def get_connection():
