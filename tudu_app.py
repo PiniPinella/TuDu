@@ -226,6 +226,24 @@ else:
         # Seite alle 60 Sekunden neu laden, um Reminder auszulösen
         st_autorefresh(interval=60 * 1000, key="reminder_refresh")
 
+
+# === DEVELOPER MODE =========================================================================================
+
+if st.session_state.user_id:
+    with st.sidebar:
+        st.markdown("---")
+        # Developer Mode Toggle
+        dev_mode = st.toggle("🔧 Developer Mode", key="dev_mode")
+        
+        if dev_mode:
+            st.markdown("### Backend Pages")
+            pg = st.navigation([
+                st.Page("pages/test.py", title="Backend", icon="🔧"),
+                st.Page("pages/dataframe.py", title="DataFrames", icon="📊"),
+                st.Page("pages/code_1.py", title="Code", icon="💻")
+            ])
+            pg.run()
+
 # === CUSTOM STYLING =========================================================================================
 st.markdown(    
     """<style>
