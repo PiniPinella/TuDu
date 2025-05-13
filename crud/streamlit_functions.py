@@ -152,7 +152,7 @@ def show_tasks_for_list(list_id):
     st.markdown("---")
 
     # Neue Aufgabe Button
-    if st.button("➕ Neue Aufgabe hinzufügen", use_container_width=True):
+    if st.button(":material/add: Neue Aufgabe hinzufügen", use_container_width=True):
         st.session_state["show_add_form"] = True
 
     if st.session_state.get("show_add_form"):

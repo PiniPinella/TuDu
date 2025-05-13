@@ -184,8 +184,104 @@ else:
     #         Deadline: {row.deadline.strftime('%d.%m.%Y %H:%M')}
     #         """)
 
-    # STREAMLIT CODE:
+    
+
+
+# === DEVELOPER MODE =========================================================================================
+
+if st.session_state.user_id:
     with st.sidebar:
+        st.markdown("---")
+        # Developer Mode Toggle
+        dev_mode = st.toggle(":material/build: Developer Mode", key="dev_mode")
+if dev_mode:
+    st.session_state.developer_mode = True
+    tab1, tab2, tab3, tab4, tab5 = st.tabs(["Code get_user", "Dataframe", "GUIaufbau", "Functions", "Reminder Jingles"])
+    with tab1:
+        st.title("Beispielcode:")
+        st.text("Hier können wir Teile vom code zeigen während sie in-app ausgeführt werden!/n" \
+        "  zB die Funktion um den User-Name anzeigen")
+        code = '''def get_user_name(user_id):
+                    query = "SELECT first_name FROM users WHERE user_id = %s"
+                    with get_connection() as connection:
+                        with connection.cursor() as cursor:
+                            cursor.execute(query, (user_id,))
+                            result = cursor.fetchone()
+                            return result[0] if result else None'''
+        st.code(code, language="python")
+    with tab2:
+        st.subheader('DataFrame interaktiv:')
+        df = get_tasks_df(st.session_state.user_id, st.session_state.selected_list_id)
+        edited_df = st.data_editor(df, hide_index = True, num_rows="dynamic")
+                
+    with tab3:
+        st.header("GUI-Aufbau:")
+        st.text('''(unaufgeteilte Version)
+
+                Imports
+
+                Verbindung
+
+                Funktionen
+                - Login/ User
+                - Lists
+                - Tasks
+                - Reminder
+                - Streamlit-Funktionen
+
+                GUI-Code
+                Flow: Login → Listen → Tasks → Reminder
+
+                1. Setup
+                - Titel & Layout ("Tu Du App")
+                - user_id prüfen
+
+                2. Login/Registrierung
+                - Login: Email/Passwort → login_user() → Erfolg: user_id speichern
+                - Registrierung: Name/Email/Passwort → create_user()
+
+                3. Hauptapp (nach Login)
+                - Sidebar:
+                -- Benutzername + Logout
+                -- Listen: Auswahl/Neue Liste (create_list)/Löschen (delete_list)
+                -- Erinnerungen: Jingle-Auswahl + Ton-Checkbox
+
+                - Tasks: 
+                -- show_tasks_for_list() + Auto-Refresh (60s)
+
+                4. Styling
+                ''')
+    with tab4:
+        st.title("Platzhalter-Funktionen")
+        st.caption("(es kamen später deutlich mehr dazu...)")
+        code = '''
+
+
+        def get_user_lists(user_id):
+            """Hier Funktion zum Abrufen aller Listen eines Benutzers"""
+
+        def delete_list(list_id):
+            """Hier Funktion zum Löschen einer Liste"""
+
+        def create_list(user_id, list_name):
+            """Hier Funktion zum Erstellen einer neuen Liste"""
+
+        def get_tasks(list_id):
+            """Hier Funktion zum Abrufen aller Aufgaben einer Liste"""
+
+        def add_task(list_id, task_name):
+            """Hier Funktion zum Hinzufügen einer Aufgabe"""
+
+        def update_task(task_id, completed):
+            """Hier Funktion zum Aktualisieren des Aufgabenstatus"""
+            
+        def delete_task(task_id):
+            """Hier Funktion zum Löschen einer Aufgabe"""'''
+
+        st.code(code, language="python")
+
+        st.text("Dadurch konnte ich auch ohne fertigen Code ein GUI-Skelett bauen :)")    
+    with tab5:
         st.title("Reminder Jingles")
 
         # Liste der verfügbaren Jingles
@@ -206,31 +302,8 @@ else:
             # Dann in den assets-Ordner:
             file_path = os.path.join(base_dir, "assets", selected_file)
             play_button_jingle(file_path)
+        
 
-
-# === DEVELOPER MODE =========================================================================================
-   
-    if st.session_state.user_id:
-        with st.sidebar:
-            st.markdown("---")
-            # Developer Mode Toggle
-            dev_mode = st.toggle("🔧 Developer Mode", key="dev_mode")
-            base_dir = os.path.dirname(__file__)
-            if not dev_mode:
-                pass
-            else:
-                # Developer-Ansicht
-                st.title("Developer Backend")
-                if st.button("??"):
-                    st.write(os.path.join(base_dir, "pages", "test.py"))
-                if st.button("Backend"):
-                    st.switch_page("pages/test.py")
-                if st.button("DataFrames"):
-                    st.switch_page("pages/dataframe.py")
-                if st.button("Code"):
-                    st.switch_page("pages/code_1.py")
-                    
-    
     # === Reminder prüfen & Autorefresh aktivieren ===========================================================
     if (st.session_state.get("user_id")
         and "selected_list_id" in st.session_state
@@ -244,8 +317,6 @@ else:
         # Seite alle 60 Sekunden neu laden, um Reminder auszulösen
         st_autorefresh(interval=60 * 1000, key="reminder_refresh")
 
-
-# === DEVELOPER MODE =========================================================================================
 
 
 
