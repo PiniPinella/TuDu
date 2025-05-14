@@ -2,7 +2,7 @@ import os
 import pandas as pd
 import streamlit as st
 from streamlit_autorefresh import st_autorefresh  # pip install streamlit-autorefresh
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, time
 import psycopg2
 import bcrypt
 import base64
@@ -92,10 +92,15 @@ def render_edit_task(row):
         new_repeat_interval = st.slider(
             "Wiederhole alle ... Tage (0 = nie)",
             0, 31, value=row['repeat_interval'] or 0)
-
+        
         # Erinnerung
-        reminder_date_value = row['reminder'].date() if pd.notna(row['reminder']) else datetime.today().date()
-        reminder_time_value = row['reminder'].time() if pd.notna(row['reminder']) else datetime.now().time()
+        if pd.notna(row['reminder']):
+            reminder_date_value = row['reminder'].date()
+            reminder_time_value = row['reminder'].time()
+        else:
+            reminder_date_value = datetime.today().date()
+            reminder_time_value = time(9, 0)  # statisch statt datetime.now().time()
+
         new_reminder_date = st.date_input("Erinnern am", value=reminder_date_value, key=f"reminder_date_input_{row['task_id']}")
         new_reminder_time = st.time_input("Uhrzeit", value=reminder_time_value, key=f"reminder_time_input_{row['task_id']}")
         new_reminder = datetime.combine(new_reminder_date, new_reminder_time)
@@ -138,7 +143,11 @@ def render_edit_task(row):
 
 # EDIT TASKS
 def show_tasks_for_list(list_id):
-    st.subheader(f"Aufgaben in Liste: {st.session_state.selected_list_name}")
+    st.markdown(
+    f"<div style='font-size:40px; font-family:Verdana; color:#ffebcd;'><b>{st.session_state.selected_list_name}:</b></div>",
+    unsafe_allow_html=True
+)
+
     tasks_df = get_tasks_df(st.session_state.user_id, list_id)
 
     for index, row in tasks_df.iterrows():
@@ -199,8 +208,11 @@ def add_new_task(list_id):
             st.caption(f"Wiederholt sich alle {repeat_interval} Tage")
 
         # Erinnerung
-        reminder_date = st.date_input("Erinnern am", value=datetime.today().date(), key="reminder_date")
-        reminder_time = st.time_input("Uhrzeit", value=datetime.now().time(), key="reminder_time")
+        default_reminder_date = datetime.today().date()
+        default_reminder_time = time(9, 0)  # z.B. feste Uhrzeit statt jetzt()
+
+        reminder_date = st.date_input("Erinnern am", value=default_reminder_date, key="reminder_date")
+        reminder_time = st.time_input("Uhrzeit", value=default_reminder_time, key="reminder_time")
         reminder = datetime.combine(reminder_date, reminder_time)
 
         col1, col2 = st.columns(2)

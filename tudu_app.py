@@ -27,20 +27,10 @@ from utils.reminders import get_due_reminders, check_due_reminders, remove_remin
 # === START STREAMLIT MAIN CODE ==============================================================================
 # ============================================================================================================
 
-st.set_page_config(page_title="Tu Du App", layout="centered")
+st.set_page_config() #(page_title="", layout="centered")
 # st.title("Tu Du App")
 # st.markdown("<h1 style='color:#4CAF50; text-align: center;'>Tu Du App</h1>", unsafe_allow_html=True)
 
-st.markdown("""
-    <h1 style='
-        font-size: 56px;
-        font-family: "Verdana", cursive;
-        color: #ffebcd;
-        text-align: center;
-    '>
-        Tu Du App
-    </h1>
-""", unsafe_allow_html=True)
 
 # Session State initialisieren
 if 'user_id' not in st.session_state:
@@ -84,6 +74,14 @@ else:
     
     # USER ANGEMELDET ALS:
     with st.sidebar:
+        st.markdown("""
+            <div style='font-size:46px; font-family:Verdana; color:#ffebcd;'>
+            <b>Tu Du App</b>
+            </div>
+            """, unsafe_allow_html=True)
+        st.sidebar.markdown("<br>", unsafe_allow_html=True)
+
+    with st.sidebar:
         # 👤 Benutzername ganz oben anzeigen 
         # Custom Farbe: zB. #f0f2f6 = helles Grau-Blau
         #                   #ffebcd = Beige
@@ -102,7 +100,7 @@ else:
                 </div>
                 """,
                 unsafe_allow_html=True)
-        st.markdown("---")  # Trennlinie
+        st.sidebar.markdown("<br>", unsafe_allow_html=True)
         
         # === Logout-Button ==================================================================================
         if st.button("Logout", use_container_width=True):
@@ -348,7 +346,7 @@ if dev_mode:
 st.markdown(    
     """<style>
         .stApp {
-            background-color: #2E4756;
+            background-color: #264653;
         }
         .stButton>button {
             background-color: #3C7A89;
@@ -361,7 +359,7 @@ st.markdown(
             color: #52050A;
         }
         .stSidebar {
-            background-color: #3C7A89;
+            background-color: #9A879D;
         }
         .sidebar-button {
             background-color: #4CAF50;
@@ -375,7 +373,7 @@ st.markdown(
             margin-bottom: 10px;
         }
         .sidebar-button:hover {
-            background-color: #45a049;
+            background-color: #E9C369;
             color: white;
         }
     </style>
