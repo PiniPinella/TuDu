@@ -204,8 +204,8 @@ if st.session_state.user_id:
         st.markdown("---")
         # Developer Mode Toggle
         dev_mode = st.toggle(":material/build: Developer Mode", key="dev_mode")
-if dev_mode:
-    st.session_state.developer_mode = True
+
+if st.session_state.get("dev_mode"):
     tab1, tab2, tab3, tab4, tab5 = st.tabs(["GUI Aufbau", "Functions", "Dataframe", "Hybrid-Lösung", "Reminder Jingles"])
    
     with tab1:
