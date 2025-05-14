@@ -17,40 +17,41 @@ from crud.tasks import update_task_status, delete_task, update_tasks, get_tasks_
 
 # SHOW TASKS
 def render_show_task(row, index):
-    col1, col2, col3 = st.columns([6, 0.7, 0.7])
+    col1, col2, col3, col4 = st.columns([6, 2, 0.7, 0.7])
 
     # Deadline Farbe abhängig von Dringlichkeit
     deadline = row['deadline']
     now = datetime.now()
     # Farbe wählen je nach Status
     if deadline < now:
-        color = "red"
+        color = "#D3212C"
     elif (deadline - now).days <= 1:
-        color = "orange"
+        color = "#FF980E"
     else:
-        color = "green"
+        color = "#069C56"
     # Formatierte Ausgabe mit farbigem Datum
     deadline_str = deadline.strftime('%d.%m.%Y %H:%M')
     
     with col1:
-        st.markdown(
-            f"{row['task_name']} <span style='color:{color}; font-weight:bold;'>({deadline_str})</span>",
-            unsafe_allow_html=True)
-    
         # Checkbox extra:
         new_status = st.checkbox(
-            " erledigt?", value=row['completed'],
+            row['task_name'], value=row['completed'],
             key=f"task:{row['task_id']}_{index}")
         
         if new_status != row['completed']:
             update_task_status(row['task_id'], new_status)
             st.toast("Aufgabe aktualisiert!")
-
     with col2:
+        st.markdown(
+            f"<div style='display: flex; align-items: bottom; height: 100%;'>"
+            f"<span style='color:{color}; font-weight:bold;'>({deadline_str})</span>"
+            f"</div>",
+            unsafe_allow_html=True)
+    with col3:
         if st.button(":material/edit:", key=f"edit_{row['task_id']}"):
             st.session_state['editing_task'] = row['task_id']
 
-    with col3:
+    with col4:
         if st.button(":material/delete:", key=f"delete_{row['task_id']}"):
             st.session_state["task_to_delete"] = row['task_id']
 
