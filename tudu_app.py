@@ -75,8 +75,11 @@ else:
     # USER ANGEMELDET ALS:
     with st.sidebar:
         st.markdown("""
-            <div style='font-size:46px; font-family:Verdana; color:#ffebcd;'>
-            <b>Tu Du App</b>
+            <div style='font-size:70px; font-family:Arial Black; color:#264653;
+            letter-spacing: 2px;
+            line-height: 0.5;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);'>
+            <b>TuDu</b>
             </div>
             """, unsafe_allow_html=True)
         st.sidebar.markdown("<br>", unsafe_allow_html=True)
@@ -108,8 +111,11 @@ else:
             st.rerun()
 
     # === LISTEN MANAGEMENT: =================================================================================
-    st.sidebar.title("Meine Listen")
-    
+    st.sidebar.markdown("""
+            <h1 style='font-size:36px; font-weight: bold; color:#264653;line-height: 1.5; border-bottom:1px solid grey; padding-bottom:8px;'>
+            Meine Listen
+            </h1><br>
+            """, unsafe_allow_html=True)
     with st.sidebar:
         if 'user_id' in st.session_state and st.session_state.user_id:
         # Bestehende Listen anzeigen
@@ -194,45 +200,53 @@ if st.session_state.user_id:
         dev_mode = st.toggle(":material/build: Developer Mode", key="dev_mode")
 if dev_mode:
     st.session_state.developer_mode = True
-    tab1, tab2, tab3, tab4, tab5, tab6 = st.tabs(["GUI Aufbau", "Functions", "Dataframe", "Hybrid-Lösung", "Reminder Jingles", "Jo's Code"])
+    tab1, tab2, tab3, tab4, tab5 = st.tabs(["GUI Aufbau", "Functions", "Dataframe", "Hybrid-Lösung", "Reminder Jingles"])
    
     with tab1:
         st.header("GUI-Aufbau:")
-        st.markdown('''(unaufgeteilte Version)
+        
+        st.markdown("""
+            ## ***Verbindung & Funktionen***
 
-                ***Imports***
+            ### **Funktionen**  
+            - **Login/User**  
+            - **Listenverwaltung**  
+            - **Tasks (Aufgaben)**  
+            - **Reminder (Erinnerungen)**  
+            - **Streamlit-Integration**  
 
-                ***Verbindung***
+            ## ***GUI-Code – Flow***  
+            `Login → Listen → Tasks → Reminder`  
 
-                ***Funktionen***
-                - Login/ User
-                - Lists
-                - Tasks
-                - Reminder
-                - Streamlit-Funktionen
+            ### **1. Setup**  
+            - **Titel & Layout** ("Tu Du App")  
+            - `user_id`-Prüfung  
 
-                ***GUI-Code***
-                Flow: Login → Listen → Tasks → Reminder
+            ### **2. Login/Registrierung**  
+            - **Login**:  
+            - Email/Passwort → `login_user()`  
+            - Bei Erfolg: `user_id` speichern  
+            - **Registrierung**:  
+            - Name/Email/Passwort → `create_user()`  
 
-                **1. Setup**
-                - Titel & Layout ("Tu Du App")
-                - user_id prüfen
+            ### **3. Hauptapp (nach Login)**  
+            #### **Sidebar**  
+            - Benutzername + **Logout**-Button  
+            - **Listen**:  
+            - Auswahl vorhandener Listen  
+            - `create_list` (Neue Liste)  
+            - `delete_list` (Löschen)  
+            - **Erinnerungen**:  
+            - Jingle-Auswahl  
+            - Ton aktivieren/deaktivieren (Checkbox)  
 
-                **2. Login/Registrierung**
-                - Login: Email/Passwort → login_user() → Erfolg: user_id speichern
-                - Registrierung: Name/Email/Passwort → create_user()
+            #### **Tasks**  
+            - `show_tasks_for_list()`  
+            - Auto-Refresh (60s Intervall)  
 
-                **3. Hauptapp (nach Login)**
-                - Sidebar:
-                -- Benutzername + Logout
-                -- Listen: Auswahl/Neue Liste (create_list)/Löschen (delete_list)
-                -- Erinnerungen: Jingle-Auswahl + Ton-Checkbox
+            ### **4. Styling**  
 
-                - Tasks: 
-                -- show_tasks_for_list() + Auto-Refresh (60s)
-
-                **4. Styling**
-                ''')
+            """)
     with tab2:
         st.title("Platzhalter-Funktionen")
         st.caption("(es kamen später deutlich mehr dazu...)")
@@ -282,7 +296,7 @@ if dev_mode:
             for index, row in tasks_df.iterrows():
                 render_show_task(row, index) # Zeilenweise Anzeige mit Buttons
 
-                neuer_wert = st.checkbox(row['task_name'], value=row['Spaltenname'])
+                neuer_wert = st.text_input(row['task_name'], value=row['Spaltenname'])
 
                 # Aktualisierungslogik stehen
                 if neuer_wert != row['Spaltenname']:
@@ -311,21 +325,7 @@ if dev_mode:
             file_path = os.path.join(base_dir, "assets", selected_file)
             play_button_jingle(file_path)
         
-    with tab6: 
-        st.title("Code von Jo:")
-        st.text("Hier ein Python code:")
-        code = '''def get_user_name(user_id):
-                    query = "SELECT first_name FROM users WHERE user_id = %s"
-                    with get_connection() as connection:
-                        with connection.cursor() as cursor:
-                            cursor.execute(query, (user_id,))
-                            result = cursor.fetchone()
-                            return result[0] if result else None'''
-        st.code(code, language="python")
-        st.text("Hier ein SQL code:")
-        code_sql = "SELECT * FROM tasks;"
-        st.code(code_sql, language="sql")
-
+    
     # === Reminder prüfen & Autorefresh aktivieren ===========================================================
     if (st.session_state.get("user_id")
         and "selected_list_id" in st.session_state
@@ -355,27 +355,37 @@ st.markdown(
             border-radius: 10px;
         }
         .stTitle {
-            font-family: 'Georgia', serif;
             color: #52050A;
         }
         .stSidebar {
             background-color: #9A879D;
+            color: black;
         }
-        .sidebar-button {
-            background-color: #4CAF50;
-            color: white;
-            padding: 0.5em 1em;
-            text-align: center;
-            display: block;
-            border-radius: 8px;
-            text-decoration: none;
-            font-weight: bold;
-            margin-bottom: 10px;
+        /* Nur Radio, Checkbox & Toggle in der Sidebar */
+        .stSidebar .stRadio label,
+        .stSidebar .stCheckbox label, 
+        .stSidebar .stToggle label {
+            color: black !important;
         }
-        .sidebar-button:hover {
-            background-color: #E9C369;
-            color: white;
-        }
+        .stSidebar div[role="radiogroup"] label div div,
+        .stSidebar .stCheckbox label div div,
+        .stSidebar .stToggle label div div {
+        color: black !important;
+        } 
+.stButton>button, .sidebar-button {
+        background-color: #3C7A89 !important;
+        color: white !important;
+        font-size: 16px;
+        border-radius: 10px;
+        border: none !important;
+        transition: background-color 0.3s ease !important;
+    }
+
+    /* Hover-Effekt für ALLE Buttons */
+    .stButton>button:hover, .sidebar-button:hover {
+        background-color: #123440 !important;
+        color: white !important; /* Schrift bleibt weiß */
+    }
     </style>
     """,
     unsafe_allow_html=True)
