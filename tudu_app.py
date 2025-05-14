@@ -288,19 +288,17 @@ if dev_mode:
         st.text('Änderungen müssen in einer Variablen "abgefangen" werden:')
         code = """
         def show_tasks_for_list(user_id, list_id):
-    with get_connection() as connection:
-        with connection.cursor() as cursor:
-            query = '''SELECT task_id, task_name FROM tasks 
-                     WHERE user_id = %s AND list_id = %s''''
+            query = ''' SELECT task_id, task_name FROM tasks 
+                        WHERE user_id = %s AND list_id = %s''''
             tasks_df = pd.read_sql(query, connection, params= (user_id, list_id))
             for index, row in tasks_df.iterrows():
-                render_show_task(row, index) # Zeilenweise Anzeige mit Buttons
+                show_task(row, index) # Zeilenweise Anzeige mit Input-Feldern
 
                 neuer_wert = st.text_input(row['task_name'], value=row['Spaltenname'])
 
-                # Aktualisierungslogik stehen
+                # Aktualisierungslogik für die SQL Datenbank:
                 if neuer_wert != row['Spaltenname']:
-                    update_task_status(row['task_id'], neuer_wert)"""
+                    update_task_sql(row['task_id'], neuer_wert)"""
         st.code(code, language="python")
     
     with tab5:
