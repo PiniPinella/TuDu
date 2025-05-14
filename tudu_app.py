@@ -216,31 +216,31 @@ if dev_mode:
                 
     with tab3:
         st.header("GUI-Aufbau:")
-        st.text('''(unaufgeteilte Version)
+        st.markdown('''(unaufgeteilte Version)
 
-                Imports
+                ***Imports***
 
-                Verbindung
+                ***Verbindung***
 
-                Funktionen
+                ***Funktionen***
                 - Login/ User
                 - Lists
                 - Tasks
                 - Reminder
                 - Streamlit-Funktionen
 
-                GUI-Code
+                ***GUI-Code***
                 Flow: Login → Listen → Tasks → Reminder
 
-                1. Setup
+                **1. Setup**
                 - Titel & Layout ("Tu Du App")
                 - user_id prüfen
 
-                2. Login/Registrierung
+                **2. Login/Registrierung**
                 - Login: Email/Passwort → login_user() → Erfolg: user_id speichern
                 - Registrierung: Name/Email/Passwort → create_user()
 
-                3. Hauptapp (nach Login)
+                **3. Hauptapp (nach Login)**
                 - Sidebar:
                 -- Benutzername + Logout
                 -- Listen: Auswahl/Neue Liste (create_list)/Löschen (delete_list)
@@ -249,7 +249,7 @@ if dev_mode:
                 - Tasks: 
                 -- show_tasks_for_list() + Auto-Refresh (60s)
 
-                4. Styling
+                **4. Styling**
                 ''')
     with tab4:
         st.title("Platzhalter-Funktionen")
