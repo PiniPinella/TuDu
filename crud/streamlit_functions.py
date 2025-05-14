@@ -144,7 +144,7 @@ def render_edit_task(row):
 # EDIT TASKS
 def show_tasks_for_list(list_id):
     st.markdown(
-    f"<div style='font-size:40px; font-family:Verdana; color:#ffebcd;'><b>{st.session_state.selected_list_name}:</b></div>",
+    f"<div style='font-size:40px; font-family:Verdana; color:#ffebcd; border-bottom:1px solid grey;'><b>{st.session_state.selected_list_name}</b></div><br>",
     unsafe_allow_html=True
 )
 
