@@ -1,8 +1,8 @@
 # ============================================= TuDu_APP =====================================================
 # ============================================================================================================ 
-# Praxis Projekt SQL: Laura, Suse, Jo :2025-05-08 - 2025-05-16
+# Praxis Projekt SQL: Laura, Suse, Jo :2025-05-08 - 2025-05-15
 
-# streamlit run app\tudu_app_test.py
+# streamlit run app\tudu_app.py
 
 import os
 import pandas as pd
@@ -156,17 +156,39 @@ else:
         show_tasks_for_list(st.session_state.selected_list_id)
     
     # === Liste löschen ======================================================================================
+    # In der Sidebar
     if st.sidebar.button(":material/delete: Aktuelle Liste löschen", use_container_width=True):
-        if 'selected_list_id' in st.session_state:
-            # DEBUG: Ausgabe zur Überprüfung
-            st.write(f"Versuche zu löschen: ID={st.session_state.selected_list_id}, Typ={type(st.session_state.selected_list_id)}")
-            
-            if delete_list(st.session_state.selected_list_id):
-                st.success("Liste erfolgreich gelöscht!")
-                del st.session_state.selected_list_id  # Clear the selection
-                st.rerun()
+        if 'selected_list_id' in st.session_state and 'selected_list_name' in st.session_state:
+            st.session_state["list_to_delete"] = {
+                "list_id": st.session_state.selected_list_id,
+                "list_name": st.session_state.selected_list_name
+            }
         else:
             st.warning("Keine Liste ausgewählt")
+
+    # Bestätigungsformular anzeigen
+    if "list_to_delete" in st.session_state:
+        data = st.session_state["list_to_delete"]
+
+        with st.sidebar.form(key=f"confirm_delete_list_{data['list_id']}"):
+            st.warning(f"Liste **'{data['list_name']}'** wirklich löschen? "
+                    "Alle zugehörigen Aufgaben werden ebenfalls entfernt!")
+
+            col_confirm, col_cancel = st.columns(2)
+
+            with col_confirm:
+                if st.form_submit_button("Do it!", use_container_width=True):
+                    if delete_list(data["list_id"]):
+                        st.success("Liste erfolgreich gelöscht!")
+                        del st.session_state["list_to_delete"]
+                        del st.session_state["selected_list_id"]
+                        del st.session_state["selected_list_name"]
+                        st.rerun()
+
+            with col_cancel:
+                if st.form_submit_button("Abbrechen", use_container_width=True):
+                    del st.session_state["list_to_delete"]
+                    st.info("Löschen abgebrochen.")
 
     # === Erinnerung mit optionalem Jingle ===================================================================
     st.markdown("---")
@@ -174,22 +196,6 @@ else:
 
     # User kann hier Jingle aktivieren
     play_sound = st.sidebar.checkbox("Mit Ton erinnern", value=True)
-
-    # Hole fällige Erinnerungen
-    # due_tasks = get_due_reminders(st.session_state.user_id)
-    # if due_tasks.empty:
-    #     st.sidebar.info("Keine aktuellen Erinnerungen.")
-    # else:
-    #     st.sidebar.subheader("Fällige Erinnerungen:")
-    #     for row in due_tasks.itertuples():
-    #         st.sidebar.markdown(f"""
-    #         {row.task_name}
-    #         Erinnerung: {row.reminder.strftime('%d.%m.%Y %H:%M')}
-    #         Deadline: {row.deadline.strftime('%d.%m.%Y %H:%M')}
-    #         """)
-
-    
-
 
 # === DEVELOPER MODE =========================================================================================
 
@@ -322,8 +328,7 @@ if dev_mode:
             # Dann in den assets-Ordner:
             file_path = os.path.join(base_dir, "assets", selected_file)
             play_button_jingle(file_path)
-        
-    
+          
     # === Reminder prüfen & Autorefresh aktivieren ===========================================================
     if (st.session_state.get("user_id")
         and "selected_list_id" in st.session_state
@@ -336,9 +341,6 @@ if dev_mode:
         check_due_reminders(due_tasks, play_sound)
         # Seite alle 60 Sekunden neu laden, um Reminder auszulösen
         st_autorefresh(interval=60 * 1000, key="reminder_refresh")
-
-
-
 
 # === CUSTOM STYLING =========================================================================================
 st.markdown(    
@@ -388,4 +390,4 @@ st.markdown(
     """,
     unsafe_allow_html=True)
 
-# streamlit run app\tudu_app_test.py
+# streamlit run app\tudu_app.py
