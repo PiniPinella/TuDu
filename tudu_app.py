@@ -196,25 +196,9 @@ if st.session_state.user_id:
         dev_mode = st.toggle(":material/build: Developer Mode", key="dev_mode")
 if dev_mode:
     st.session_state.developer_mode = True
-    tab1, tab2, tab3, tab4, tab5 = st.tabs(["Code get_user", "Dataframe", "GUIaufbau", "Functions", "Reminder Jingles"])
+    tab1, tab2, tab3, tab4, tab5, tab6 = st.tabs(["GUI Aufbau", "Functions", "Dataframe", "Hybrid-Lösung", "Reminder Jingles", "Jo's Code"])
+   
     with tab1:
-        st.title("Beispielcode:")
-        st.text("Hier können wir Teile vom code zeigen während sie in-app ausgeführt werden!/n" \
-        "  zB die Funktion um den User-Name anzeigen")
-        code = '''def get_user_name(user_id):
-                    query = "SELECT first_name FROM users WHERE user_id = %s"
-                    with get_connection() as connection:
-                        with connection.cursor() as cursor:
-                            cursor.execute(query, (user_id,))
-                            result = cursor.fetchone()
-                            return result[0] if result else None'''
-        st.code(code, language="python")
-    with tab2:
-        st.subheader('DataFrame interaktiv:')
-        df = get_tasks_df(st.session_state.user_id, st.session_state.selected_list_id)
-        edited_df = st.data_editor(df, hide_index = True, num_rows="dynamic")
-                
-    with tab3:
         st.header("GUI-Aufbau:")
         st.markdown('''(unaufgeteilte Version)
 
@@ -251,7 +235,7 @@ if dev_mode:
 
                 **4. Styling**
                 ''')
-    with tab4:
+    with tab2:
         st.title("Platzhalter-Funktionen")
         st.caption("(es kamen später deutlich mehr dazu...)")
         code = '''
@@ -281,6 +265,32 @@ if dev_mode:
         st.code(code, language="python")
 
         st.text("Dadurch konnte ich auch ohne fertigen Code ein GUI-Skelett bauen :)")    
+
+    with tab3:
+        st.subheader('DataFrame interaktiv:')
+        df = get_tasks_df(st.session_state.user_id, st.session_state.selected_list_id)
+        edited_df = st.data_editor(df, hide_index = True, num_rows="dynamic")
+
+    with tab4:
+        st.title("Hybrid-Lösung:")
+        st.text('Änderungen müssen in einer Variablen "abgefangen" werden:')
+        code = """
+        def show_tasks_for_list(user_id, list_id):
+    with get_connection() as connection:
+        with connection.cursor() as cursor:
+            query = '''SELECT task_id, task_name FROM tasks 
+                     WHERE user_id = %s AND list_id = %s''''
+            tasks_df = pd.read_sql(query, connection, params= (user_id, list_id))
+            for index, row in tasks_df.iterrows():
+                render_show_task(row, index) # Zeilenweise Anzeige mit Buttons
+
+                neuer_wert = st.checkbox(row['task_name'], value=row['Spaltenname'])
+
+                # Aktualisierungslogik stehen
+                if neuer_wert != row['Spaltenname']:
+                    update_task_status(row['task_id'], neuer_wert)"""
+        st.code(code, language="python")
+    
     with tab5:
         st.title("Reminder Jingles")
 
@@ -303,6 +313,20 @@ if dev_mode:
             file_path = os.path.join(base_dir, "assets", selected_file)
             play_button_jingle(file_path)
         
+    with tab6: 
+        st.title("Code von Jo:")
+        st.text("Hier ein Python code:")
+        code = '''def get_user_name(user_id):
+                    query = "SELECT first_name FROM users WHERE user_id = %s"
+                    with get_connection() as connection:
+                        with connection.cursor() as cursor:
+                            cursor.execute(query, (user_id,))
+                            result = cursor.fetchone()
+                            return result[0] if result else None'''
+        st.code(code, language="python")
+        st.text("Hier ein SQL code:")
+        code_sql = "SELECT * FROM tasks;"
+        st.code(code_sql, language="sql")
 
     # === Reminder prüfen & Autorefresh aktivieren ===========================================================
     if (st.session_state.get("user_id")
